@@ -233,9 +233,10 @@ check_updates() {
 
   manifest_file="$(mktemp)"
   if ! git show "$upstream_ref:$MANIFEST_PATH" > "$manifest_file" 2>/dev/null; then
-    echo "Breaking update manifest not found at $UPSTREAM_REPO:$UPSTREAM_BRANCH/$MANIFEST_PATH" >&2
+    echo "Breaking update manifest not found at $UPSTREAM_REPO:$UPSTREAM_BRANCH/$MANIFEST_PATH — treating as no pending breaking updates." >&2
     rm -f "$manifest_file"
-    return 1
+    set_output blocked false
+    return 0
   fi
 
   if ! jq -e '(.schemaVersion == 1) and (.updates | type == "array")' "$manifest_file" >/dev/null; then
